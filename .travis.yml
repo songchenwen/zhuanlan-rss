@@ -1,0 +1,22 @@
+branches:
+  only:
+    - source
+language: node_js
+node_js:
+  - "0.10"
+script:
+  - "npm install"
+  - "nodejs index.js"
+after_success:
+  - "mkdir -p git_deploy"
+  - "cd git_deploy"
+  - "rm -rf ./*"
+  - "git clone --depth=2 --branch=gh-pages https://$GH_TOKEN@github.com/songchenwen/zhuanlan-rss.git ."
+  - "rm -rf ./*"
+  - "cp -r ../out/* ./"
+  - "git config --global push.default simple"
+  - "git config --global user.name 'songchenwen'"
+  - "git config --global user.email emptyzone.0@gmail.com"
+  - "git add -A"
+  - "git commit -m 'update'"
+  - "git push"
