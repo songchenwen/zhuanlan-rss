@@ -5,7 +5,6 @@ language: node_js
 node_js:
   - "0.10"
 script:
-  - "npm install"
   - "node index.js"
 after_success:
   - "mkdir -p git_deploy"
@@ -20,3 +19,6 @@ after_success:
   - "git add -A"
   - "git commit -m 'update'"
   - "git push"
+env:
+  global:
+    secure: mJQwiECT8BydJer3bCUEsfKfo4Ibsogtm6oxmhN7Ay+aAqaq/N6ne4b3fdw0O0JrU/fNphBBaYzVxkRRK92F2KdjI6LpvMD/Z90iOtQoqDC/6grcttGVvi7oOeax500nFp8Id/GmexRKUMsLunNFrgmvUD2M1R/7cFWHm+uEn7s=
