@@ -1,7 +1,7 @@
 var ids = ['yeka52', 'maboyong', 'datouma', 'gaizhilizcw', 'tianhao', 'qinnan', 'lianghuan', 'talich', 
 'loveletter', 'zenithdie', 'xiaolei', 'Glasschurch', 'nosensedigit', 'oldplusnew', 'negative2', 
 'taosay', 'DKLearnsPop', 'mactalk', 'lswlsw', 'rosicky311', 'zhimovie', 'liangbianyao', 
-'bianzhongqingnianxingdongzhinan', 'phos-study', 'gushidawang-Lipen'];
+'bianzhongqingnianxingdongzhinan', 'phos-study'];
 
 var rssPath = 'out/zhuanlanrss.xml';
 
