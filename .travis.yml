@@ -15,7 +15,7 @@ after_success:
   - "cp -r ../out/* ./"
   - "git config --global push.default simple"
   - "git config --global user.name 'songchenwen'"
-  - "git config --global user.email emptyzone.0@gmail.com"
+  - "git config --global user.email sanvinsung@gmail.com"
   - "git diff --exit-code update.log || (git add -A && git commit -m 'update' && git push)"
 env:
   global:
