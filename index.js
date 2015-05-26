@@ -6,3 +6,4 @@ var ids = ['yeka52', 'maboyong', 'datouma', 'gaizhilizcw', 'tianhao', 'qinnan', 
 var rssPath = 'out/zhuanlanrss.xml';
 
 require('./lib/rss')(ids, rssPath);
+
