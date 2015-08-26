@@ -4,6 +4,7 @@
   "description": "fetch zhihu zhuanlan as rss",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "songchenwen",
@@ -11,6 +12,7 @@
   "dependencies": {
     "async": "^0.9.0",
     "request": "^2.40.0",
-    "rss": "^0.3.2"
+    "rss": "^0.3.2",
+    "express": "~4.9.x"
   }
 }
