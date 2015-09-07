@@ -11,8 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "async": "^0.9.0",
+    "express": "~4.9.x",
+    "ioredis": "^1.7.6",
+    "redis": "^1.0.0",
     "request": "^2.40.0",
-    "rss": "^0.3.2",
-    "express": "~4.9.x"
+    "rss": "^0.3.2"
   }
 }
