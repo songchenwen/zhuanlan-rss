@@ -8,36 +8,30 @@ var fs = require('fs');
 var express = require('express');
 var app = express();
 
-var rssPath = __dirname + '/out/zhuanlanrss.xml';
-
-
-var lastUpdate = 0;
-var cacheTime = 15 * 60 * 1000;
-
 app.set('port', (process.env.PORT || 5000));
 
+var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
+
 app.get('/', function(request, response) {
-	if(fs.existsSync(rssPath)){
-		if(new Date().getTime() - lastUpdate < cacheTime){
-			console.log('response from cache');
-			response.status(200).sendFile(rssPath);
-			return;
+
+	response.set('Content-Type', 'text/xml');
+	response.status('200').write(xmlHeader + '\n');
+
+	var keepAliveTimer = setInterval(function(){
+		console.log('keep alive heart beat');
+		response.write('<!-- fetching -->\n');
+	}, 20000);
+
+	rss(ids, function(err, xml){
+		clearInterval(keepAliveTimer);
+		if(err){
+			response.write(err);
 		}else{
-			console.log('cache expired');
+			xml = xml.replace(xmlHeader, '');
+			response.write(xml);
 		}
-	}else{
-		console.log('no cache file found');
-	}
-	console.log('begin request from zhihu');
-  rss(ids, rssPath, function(err){
-  	if(err){
-  		lastUpdate = 0;
-  		response.status(500).send(err);
-  	}else{
-  		lastUpdate = new Date().getTime();
-  		response.status(200).sendFile(rssPath);
-  	}
-  });
+		response.end();
+	});
 });
 
 app.listen(app.get('port'), function() {
