@@ -7,8 +7,8 @@ app.set('port', (process.env.PORT || 5000));
 
 var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
 
-app.get('/rss/:ids', function(request, response) {
-	var ids = request.params.ids.split(',');
+app.get('/', function(request, response) {
+	var ids = 'yeka52,maboyong,datouma,gaizhilizcw,tianhao,qinnan,lianghuan,talich,loveletter,zenithdie,Glasschurch,nosensedigit,oldplusnew,negative2,taosay,DKLearnsPop,mactalk,lswlsw,rosicky311,zhimovie,liangbianyao,bianzhongqingnianxingdongzhinan,phos-study,wontfallinyourlap,24frames,wuliang8910'.split(',');
 	var rss = require('./lib/rss');
 	rss.storage = storage;
 	console.log('request ids ' + ids.join(','));
