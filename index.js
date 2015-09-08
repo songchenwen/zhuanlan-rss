@@ -1,11 +1,30 @@
 
 var express = require('express');
+var bodyParser = require('body-parser');
 var storage = require('./lib/storage');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(express.static('public'));
 
 var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
+
+app.post('/', function(request, response){
+	if(request.body.ids){
+		var ids = request.body.ids.trim();
+		var ids = ids.split(',');
+		var query = '';
+		ids.forEach(function(id){
+			query = query + id.trim() + ',';
+		});
+		query = query.substring(0, query.length - 1);
+		console.log('posted ' + query);
+		response.redirect('/rss/' + query);
+	}
+	response.status(404).end();
+});
 
 app.get('/rss/:ids', function(request, response) {
 	var beginTime = new Date().getTime();
@@ -21,6 +40,7 @@ app.get('/rss/:ids', function(request, response) {
 			console.log('send header first');
 			response.set('Content-Type', 'text/xml');
 			response.status('200').write(xmlHeader + '\n');
+			headerSent = true;
 			return;
 		}
 		console.log('keep alive heart beat');

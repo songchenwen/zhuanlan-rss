@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>知乎专栏 RSS</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<!-- Bootstrap -->
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet" />
+
+	<style>
+
+		/* http://css-tricks.com/perfect-full-page-background-image/ */
+		html {
+			background: url(img/default-bg.jpg) no-repeat center center fixed; 
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
+		}
+
+		body {
+			padding-top: 20px;
+			font-size: 16px;
+			background: transparent;
+		}
+
+		h1 {
+			font-weight: 400;
+			font-size: 40px;
+		}
+
+		/* Override B3 .panel adding a subtly transparent background */
+		.panel {
+			background-color: rgba(255, 255, 255, 0.9);
+		}
+
+		.margin-base-vertical {
+			margin: 40px 0;
+		}
+
+	</style>
+
+</head>
+<body>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3 panel panel-default">
+
+				<h1 class="margin-base-vertical">知乎专栏 RSS</h1>
+
+				<p>
+					在下面输入您感兴趣的知乎专栏 ID。
+				</p>
+
+				<p>
+					多个 ID 以逗号分隔。
+				</p>
+
+				<p>
+					点击 "输出 RSS"。
+				</p>
+
+				<form class="margin-base-vertical" action="/" method="post">
+					<p class="input-group">
+						<span class="input-group-addon"><span class="icon-rss"></span></span>
+						<input type="text" class="form-control input-lg" name="ids" placeholder="知乎专栏 ID" />
+					</p>
+					<p class="help-block text-center"><small>多个 ID 以逗号分隔</small></p>
+					<p class="text-center">
+						<button type="submit" class="btn btn-success btn-lg">输出 RSS</button>
+					</p>
+					</span>
+				</form>
+
+				<div class="margin-base-vertical">
+					<small class="text-muted">Authored by <a href="http://songchenwen.com" target="_blank" >宋辰文</a>. Hosted on <a href="https://heroku.com" target="_blank" >Heroku</a>.</small>
+				</div>
+
+			</div><!-- //main content -->
+		</div><!-- //row -->
+	</div> <!-- //container -->
+
+</body>
+</html>
