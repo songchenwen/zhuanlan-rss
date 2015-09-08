@@ -7,17 +7,24 @@ app.set('port', (process.env.PORT || 5000));
 
 var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
 
-app.get('/', function(request, response) {
-	var ids = 'yeka52,maboyong,datouma,gaizhilizcw,tianhao,qinnan,lianghuan,talich,loveletter,zenithdie,Glasschurch,nosensedigit,oldplusnew,negative2,taosay,DKLearnsPop,mactalk,lswlsw,rosicky311,zhimovie,liangbianyao,bianzhongqingnianxingdongzhinan,phos-study,wontfallinyourlap,24frames,wuliang8910'.split(',');
+app.get('/rss/:ids', function(request, response) {
+	var beginTime = new Date().getTime();
+	var ids = request.params.ids.split(',');
 	var rss = require('./lib/rss');
 	rss.storage = storage;
 	console.log('request ids ' + ids.join(','));
-	response.set('Content-Type', 'text/xml');
-	response.status('200').write(xmlHeader + '\n');
+
+	var headerSent = false;
 
 	var keepAliveTimer = setInterval(function(){
+		if(!headerSent){
+			console.log('send header first');
+			response.set('Content-Type', 'text/xml');
+			response.status('200').write(xmlHeader + '\n');
+			return;
+		}
 		console.log('keep alive heart beat');
-		response.write(' \n');
+		response.write(' ');
 	}, 10000);
 
 	rss.get(ids, function(err, xml){
@@ -25,10 +32,13 @@ app.get('/', function(request, response) {
 		if(err){
 			response.write(err);
 		}else{
-			xml = xml.replace(xmlHeader, '');
+			if(headerSent){
+				xml = xml.replace(xmlHeader, '');
+			}
 			response.write(xml);
 		}
 		response.end();
+		console.log('response time ' + ((new Date().getTime() - beginTime) / 1000) + 's');
 	});
 });
 
