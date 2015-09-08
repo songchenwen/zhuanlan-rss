@@ -1,5 +1,6 @@
 
 var express = require('express');
+var compression = require('compression');
 var bodyParser = require('body-parser');
 var forceDomain = require('forcedomain');
 var rssOptions = require('./lib/rssOptions');
@@ -12,7 +13,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 if(process.env.PORT){
 	app.use(forceDomain({ hostname: rssOptions.domain }));	
 }
-app.use(express.static('public'));
+app.use(compression());
+app.use(express.static('public', { maxAge: '1d' }));
 
 var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
 
