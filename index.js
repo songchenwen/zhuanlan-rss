@@ -1,12 +1,17 @@
 
 var express = require('express');
 var bodyParser = require('body-parser');
+var forceDomain = require('forcedomain');
+var rssOptions = require('./lib/rssOptions');
 var storage = require('./lib/storage');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
+if(process.env.PORT){
+	app.use(forceDomain({ hostname: rssOptions.domain }));	
+}
 app.use(express.static('public'));
 
 var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -27,6 +32,10 @@ app.post('/', function(request, response){
 });
 
 app.get('/rss/:ids', function(request, response) {
+	if(!request.params.ids){
+		response.redirect('/');
+		return;
+	}
 	var beginTime = new Date().getTime();
 	var ids = request.params.ids.split(',');
 	var rss = require('./lib/rss');

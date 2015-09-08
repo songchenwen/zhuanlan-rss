@@ -13,6 +13,7 @@
     "async": "^0.9.0",
     "body-parser": "^1.13.3",
     "express": "~4.9.x",
+    "forcedomain": "^0.5.0",
     "ioredis": "^1.7.6",
     "request": "^2.40.0",
     "rss": "^0.3.2"
