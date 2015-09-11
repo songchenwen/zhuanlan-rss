@@ -13,7 +13,8 @@ var startTime = new Date().getTime();
 
 var app = express();
 
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 5000));
+app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 if(process.env.PORT){
@@ -122,6 +123,6 @@ app.get('/stats', function(request, response){
 	});
 });
 
-app.listen(app.get('port'), function() {
+app.listen(app.get('port'), app.get('ip'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
