@@ -4,8 +4,12 @@ var compression = require('compression');
 var bodyParser = require('body-parser');
 var forceDomain = require('forcedomain');
 var moment = require('moment');
+var cache = require('memory-cache');
 var rssOptions = require('./lib/rssOptions');
 var storage = require('./lib/storage');
+
+var cacheTime = 1 * 60 * 60 * 1000;
+
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -44,6 +48,14 @@ app.get('/rss/:ids', function(request, response) {
 	request.params.ids.split(',').forEach(function(id){
 		ids.push(id.trim());
 	});
+	var cached = cache.get(ids.join(','));
+	if(cached){
+		console.log('found mem cache for ' + ids.join(','));
+		response.set('Content-Type', 'text/xml');
+		response.status('200').write(cached);
+		response.end();
+		return;
+	}
 	var rss = require('./lib/rss');
 	rss.storage = storage;
 	console.log('request ids ' + ids.join(','));
@@ -67,6 +79,7 @@ app.get('/rss/:ids', function(request, response) {
 		if(err){
 			response.write(err);
 		}else{
+			cache.put(ids.join(','), xml, cacheTime);
 			if(headerSent){
 				xml = xml.replace(xmlHeader, '');
 			}

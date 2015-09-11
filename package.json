@@ -16,6 +16,7 @@
     "express": "~4.9.x",
     "forcedomain": "^0.5.0",
     "ioredis": "^1.7.6",
+    "memory-cache": "^0.1.4",
     "moment": "^2.10.6",
     "request": "^2.40.0",
     "rss": "^0.3.2"
