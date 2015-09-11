@@ -9,6 +9,7 @@ var rssOptions = require('./lib/rssOptions');
 var storage = require('./lib/storage');
 
 var cacheTime = 1 * 60 * 60 * 1000;
+var startTime = new Date().getTime();
 
 var app = express();
 
@@ -91,12 +92,23 @@ app.get('/rss/:ids', function(request, response) {
 });
 
 app.get('/stats', function(request, response){
+	response.status(200);
+	response.write('<p>Running for ' + moment(startTime).fromNow(true) + '</p>');
+	var memCacheKeys = cache.keys();
+	response.write('<p>Memcached ' + memCacheKeys.length + ' requests</p>');
+	if(memCacheKeys.length > 0){
+		response.write('<ul>');
+		memCacheKeys.forEach(function(key){
+			response.write('<li><small>' + key + '</small></li>');
+		});
+		response.write('</ul>');
+	}
 	storage.stats(function(err, result){
 		if(err){
-			response.send(err).end();
+			response.write(err);
+			response.end();
 			return;
 		}
-		response.status(200);
 		response.write('<table>')
 		result.forEach(function(item){
 			response.write('<tr><td><a target="_blank" href="http://zhuanlan.zhihu.com/' + 
