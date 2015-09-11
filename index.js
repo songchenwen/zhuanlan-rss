@@ -3,6 +3,7 @@ var express = require('express');
 var compression = require('compression');
 var bodyParser = require('body-parser');
 var forceDomain = require('forcedomain');
+var moment = require('moment');
 var rssOptions = require('./lib/rssOptions');
 var storage = require('./lib/storage');
 var app = express();
@@ -39,7 +40,10 @@ app.get('/rss/:ids', function(request, response) {
 		return;
 	}
 	var beginTime = new Date().getTime();
-	var ids = request.params.ids.split(',');
+	var ids = [];
+	request.params.ids.split(',').forEach(function(id){
+		ids.push(id.trim());
+	});
 	var rss = require('./lib/rss');
 	rss.storage = storage;
 	console.log('request ids ' + ids.join(','));
@@ -70,6 +74,26 @@ app.get('/rss/:ids', function(request, response) {
 		}
 		response.end();
 		console.log('response time ' + ((new Date().getTime() - beginTime) / 1000) + 's');
+	});
+});
+
+app.get('/stats', function(request, response){
+	storage.stats(function(err, result){
+		if(err){
+			response.send(err).end();
+			return;
+		}
+		response.status(200);
+		response.write('<table>')
+		result.forEach(function(item){
+			response.write('<tr><td><a target="_blank" href="http://zhuanlan.zhihu.com/' + 
+				item.id.trim() + '">' + 
+				item.id.trim() + '</a></td><td>' + 
+				moment(parseInt(item.time)).fromNow() + 
+				'</td></tr>\n');
+		});
+		response.write('</table>')
+		response.end();
 	});
 });
 
