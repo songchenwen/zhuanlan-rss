@@ -8,7 +8,7 @@ var cache = require('memory-cache');
 var rssOptions = require('./lib/rssOptions');
 var storage = require('./lib/storage');
 
-var cacheTime = 1 * 60 * 60 * 1000;
+var cacheTime = rssOptions.ttl * 60 * 1000;
 var startTime = new Date().getTime();
 
 var app = express();
