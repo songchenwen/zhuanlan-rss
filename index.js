@@ -5,11 +5,17 @@ var bodyParser = require('body-parser');
 var forceDomain = require('forcedomain');
 var moment = require('moment');
 var cache = require('memory-cache');
+var bunyan = require('bunyan');
 var rssOptions = require('./lib/rssOptions');
-var storage = require('./lib/storage');
+var Storage = require('./lib/storage');
+var Rss = require('./lib/rss');
 
+var log = bunyan.createLogger({name: 'zrss'});
 var cacheTime = rssOptions.ttl * 60 * 1000;
 var startTime = new Date().getTime();
+
+var redisUrl = process.env.REDIS_URL ? process.env.REDIS_URL : 'redis://localhost:6379';
+var storage = new Storage(redisUrl, log.child({ storage: 'redis' }));
 
 var app = express();
 
@@ -35,7 +41,7 @@ app.post('/', function(request, response){
 			query = query + id.trim() + ',';
 		});
 		query = query.substring(0, query.length - 1);
-		console.log('posted ' + query);
+		log.info('posted ' + query);
 		response.redirect('/rss/' + query);
 	}
 	response.status(404).end();
@@ -60,30 +66,29 @@ app.get('/rss/:ids', function(request, response) {
 	}
 	var cached = cache.get(ids.join(','));
 	if(cached){
-		console.log('found mem cache for ' + ids.join(','));
+		log.info('found mem cache for ' + ids.join(','));
 		response.set('Content-Type', 'text/xml');
 		response.send(cached).end();
 		return;
 	}
-	var rss = require('./lib/rss');
-	rss.storage = storage;
-	console.log('request ids ' + ids.join(','));
+	var rss = new Rss(ids, storage, log.child({ rss: 'rss' }));
+	log.info('request ids ' + ids.join(','));
 
 	var headerSent = false;
 
 	var keepAliveTimer = setInterval(function(){
 		if(!headerSent){
-			console.log('send header first');
+			log.info('send header first');
 			response.set('Content-Type', 'text/xml');
 			response.status('200').write(xmlHeader + '\n');
 			headerSent = true;
 			return;
 		}
-		console.log('keep alive heart beat');
+		log.info('keep alive heart beat');
 		response.write(' ');
 	}, 10000);
 
-	rss.get(ids, function(err, xml){
+	rss.get(function(err, xml){
 		clearInterval(keepAliveTimer);
 		if(err){
 			response.write(err);
@@ -95,7 +100,7 @@ app.get('/rss/:ids', function(request, response) {
 			response.write(xml);
 		}
 		response.end();
-		console.log('response time ' + ((new Date().getTime() - beginTime) / 1000) + 's');
+		log.info('response time ' + ((new Date().getTime() - beginTime) / 1000) + 's');
 		storage.trim();
 	});
 });
@@ -114,5 +119,5 @@ app.get('/stats', function(request, response){
 });
 
 app.listen(app.get('port'), app.get('ip'), function() {
-  console.log('Node app is running on port', app.get('port'));
+  log.info('Node app is running on port', app.get('port'));
 });
