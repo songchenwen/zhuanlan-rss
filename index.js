@@ -17,6 +17,7 @@ app.set('port', (process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 5000))
 app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
+app.set('view engine', 'jade');
 if(process.env.PORT){
 	app.use(forceDomain({ hostname: rssOptions.domain }));	
 }
@@ -93,33 +94,14 @@ app.get('/rss/:ids', function(request, response) {
 });
 
 app.get('/stats', function(request, response){
-	response.status(200);
-	response.write('<p>Running for ' + moment(startTime).fromNow(true) + '</p>');
-	var memCacheKeys = cache.keys();
-	response.write('<p>Memcached ' + memCacheKeys.length + ' requests</p>');
-	if(memCacheKeys.length > 0){
-		response.write('<ul>');
-		memCacheKeys.forEach(function(key){
-			response.write('<li><small>' + key + '</small></li>');
-		});
-		response.write('</ul>');
-	}
 	storage.stats(function(err, result){
-		if(err){
-			response.write(err);
-			response.end();
-			return;
-		}
-		response.write('<table>')
-		result.forEach(function(item){
-			response.write('<tr><td><a target="_blank" href="http://zhuanlan.zhihu.com/' + 
-				item.id.trim() + '">' + 
-				item.id.trim() + '</a></td><td>' + 
-				moment(parseInt(item.time)).fromNow() + 
-				'</td></tr>\n');
+		response.render('stats', {
+			startTime: startTime,
+			memCacheKeys: cache.keys(),
+			access: result,
+			err: err,
+			moment: moment
 		});
-		response.write('</table>')
-		response.end();
 	});
 });
 

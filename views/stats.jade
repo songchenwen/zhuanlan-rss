@@ -1,0 +1,18 @@
+html
+  title Stats
+body
+  p Running for #{moment(startTime).fromNow(true)}
+  p Memcached #{memCacheKeys.length} requests
+  - if (memCacheKeys.length > 0)
+    ul
+      for key in memCacheKeys
+        li: small #{key}
+  - if (err)
+    p #{err}
+  - else
+    - if (access && access.length > 0)
+      table
+        for item in access
+          tr
+            td: a(target='_blank' href='http://zhuanlan.zhihu.com/#{item.id.trim()}') #{item.id.trim()}
+            td #{moment(parseInt(item.time)).fromNow()}
