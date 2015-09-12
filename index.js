@@ -18,7 +18,7 @@ app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 app.set('view engine', 'jade');
-if(process.env.PORT){
+if(process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT){
 	app.use(forceDomain({ hostname: rssOptions.domain }));	
 }
 app.use(compression());
