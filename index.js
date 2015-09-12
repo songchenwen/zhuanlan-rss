@@ -54,12 +54,15 @@ app.get('/rss/:ids', function(request, response) {
 			ids.push(id);
 		}
 	});
+	if(ids.length == 0){
+		response.redirect('/');
+		return;
+	}
 	var cached = cache.get(ids.join(','));
 	if(cached){
 		console.log('found mem cache for ' + ids.join(','));
 		response.set('Content-Type', 'text/xml');
-		response.status('200').write(cached);
-		response.end();
+		response.send(cached).end();
 		return;
 	}
 	var rss = require('./lib/rss');
@@ -93,6 +96,7 @@ app.get('/rss/:ids', function(request, response) {
 		}
 		response.end();
 		console.log('response time ' + ((new Date().getTime() - beginTime) / 1000) + 's');
+		storage.trim();
 	});
 });
 
