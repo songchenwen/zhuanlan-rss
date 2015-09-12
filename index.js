@@ -49,7 +49,10 @@ app.get('/rss/:ids', function(request, response) {
 	var beginTime = new Date().getTime();
 	var ids = [];
 	request.params.ids.split(',').forEach(function(id){
-		ids.push(id.trim());
+		id = id.trim();
+		if(id){
+			ids.push(id);
+		}
 	});
 	var cached = cache.get(ids.join(','));
 	if(cached){
