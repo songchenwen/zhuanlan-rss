@@ -1,7 +1,7 @@
 html
   title Stats
 body
-  p Running for #{moment(startTime).fromNow(true)}
+  p Running for #{moment(startTime).fromNow(true)} on #{host}
   p Memcached #{memCacheKeys.length} requests
   - if (memCacheKeys.length > 0)
     ul

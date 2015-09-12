@@ -97,6 +97,7 @@ app.get('/stats', function(request, response){
 	storage.stats(function(err, result){
 		response.render('stats', {
 			startTime: startTime,
+			host: process.env.OPENSHIFT_NODEJS_PORT ? 'OpenShift' : (process.env.PORT ? 'Heroku' : 'Local'),
 			memCacheKeys: cache.keys(),
 			access: result,
 			err: err,
