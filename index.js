@@ -6,11 +6,12 @@ var forceDomain = require('forcedomain');
 var moment = require('moment');
 var cache = require('memory-cache');
 var bunyan = require('bunyan');
+var bunyanFormat = require('bunyan-format')({ outputMode: 'short' });
 var rssOptions = require('./lib/rssOptions');
 var Storage = require('./lib/storage');
 var Rss = require('./lib/rss');
 
-var log = bunyan.createLogger({name: 'zrss'});
+var log = bunyan.createLogger({name: 'zrss', stream: bunyanFormat});
 var cacheTime = rssOptions.ttl * 60 * 1000;
 var startTime = new Date().getTime();
 
