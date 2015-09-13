@@ -4,6 +4,7 @@ var compression = require('compression');
 var bodyParser = require('body-parser');
 var forceDomain = require('forcedomain');
 var moment = require('moment');
+var async = require('async');
 var memCache = require('memory-cache');
 var bunyan = require('bunyan');
 var bunyanFormat = require('bunyan-format')({ outputMode: 'short' });
@@ -11,12 +12,14 @@ var rssOptions = require('./lib/rssOptions');
 var Rss = require('./lib/rss');
 var ItemStore = require('./lib/itemStore');
 var ZhuanlanStore = require('./lib/zhuanlanStore');
+var StatsStore = require('./lib/statsStore');
 
 var log = bunyan.createLogger({name: 'zr', stream: bunyanFormat});
 
 var dbDir = (process.env.OPENSHIFT_DATA_DIR || (__dirname + '/data'));
 var itemStore = new ItemStore(dbDir + '/item', log.child({store:'item'}));
 var zhuanlanStore = new ZhuanlanStore(dbDir + '/zhuanlan', log.child({store:'zhuanlan'}));
+var statsStore = new StatsStore(dbDir + '/stats', itemStore, log.child({store:'stats'}));
 
 var memCacheTime = rssOptions.ttl * 60 * 1000;
 
@@ -69,6 +72,7 @@ app.get('/rss/:ids', function(request, response) {
 		response.redirect('/');
 		return;
 	}
+	statsStore.addRequest(request, ids);
 	var cached = memCache.get(ids.join(','));
 	if(cached){
 		log.info('found mem cache for ' + ids.join(','));
@@ -109,18 +113,39 @@ app.get('/rss/:ids', function(request, response) {
 	});
 });
 
-// app.get('/stats', function(request, response){
-// 	storage.stats(function(err, result){
-// 		response.render('stats', {
-// 			startTime: startTime,
-// 			host: process.env.OPENSHIFT_NODEJS_PORT ? 'OpenShift' : (process.env.PORT ? 'Heroku' : 'Local'),
-// 			memCacheKeys: cache.keys(),
-// 			access: result,
-// 			err: err,
-// 			moment: moment
-// 		});
-// 	});
-// });
+app.get('/stats', function(request, response){
+	var feed = {};
+	var urls;
+	var zhuanlans;
+	async.parallel([
+		function(cb){
+			statsStore.ipCount({type:'request'}, cb);
+		}, 
+		function(cb){
+			statsStore.requestCount({type:'request'}, cb);
+		},
+		function(cb){
+			statsStore.popularUrl({}, cb);
+		},
+		function(cb){
+			statsStore.popularZhuanlan({}, cb);
+		},
+	], function(err, results){
+		response.render('stats', {
+			err: err,
+			startTime: startTime,
+			host: process.env.OPENSHIFT_NODEJS_PORT ? 'OpenShift' : (process.env.PORT ? 'Heroku' : 'Local'),
+			memCacheKeys: memCache.keys(),
+			feed: {
+				ipCount: results[0],
+				requestCount: results[1]
+			},
+			urls: results[2],
+			zhuanlans: results[3],
+			moment: moment
+		});
+	});
+});
 
 app.listen(app.get('port'), app.get('ip'), function() {
   log.info('Node app is running on port', app.get('port'));
