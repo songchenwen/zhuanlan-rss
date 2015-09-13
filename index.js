@@ -113,6 +113,13 @@ app.get('/rss/:ids', function(request, response) {
 	});
 });
 
+app.get('/track/:guid/spacer.gif', function(request, response){
+	var guid = request.params.guid;
+	response.sendFile(__dirname + '/public/img/spacer.gif');
+	log.info('track for item ' + guid);
+	statsStore.addItem(guid, request);
+});
+
 app.get('/stats', function(request, response){
 	var feed = {};
 	var urls;
@@ -125,11 +132,20 @@ app.get('/stats', function(request, response){
 			statsStore.requestCount({type:'request'}, cb);
 		},
 		function(cb){
+			statsStore.ipCount({type:'item'}, cb);
+		}, 
+		function(cb){
+			statsStore.requestCount({type:'item'}, cb);
+		},
+		function(cb){
 			statsStore.popularUrl({}, cb);
 		},
 		function(cb){
 			statsStore.popularZhuanlan({}, cb);
 		},
+		function(cb){
+			statsStore.popularItem({}, cb);
+		}
 	], function(err, results){
 		response.render('stats', {
 			err: err,
@@ -140,8 +156,13 @@ app.get('/stats', function(request, response){
 				ipCount: results[0],
 				requestCount: results[1]
 			},
-			urls: results[2],
-			zhuanlans: results[3],
+			item: {
+				ipCount: results[2],
+				requestCount: results[3]
+			},
+			urls: results[4],
+			zhuanlans: results[5],
+			items: results[6],
 			moment: moment
 		});
 	});

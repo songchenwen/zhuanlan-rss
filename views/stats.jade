@@ -5,6 +5,7 @@ body
     p #{err}
   p Running for #{moment(startTime).fromNow(true)} on #{host}
   p Feed IP: #{feed.ipCount} | Request: #{feed.requestCount} | in 24h
+  p Item View IP: #{item.ipCount} | Request: #{item.requestCount} | in 24h
 
   - if(urls && urls.length > 0)
     div
