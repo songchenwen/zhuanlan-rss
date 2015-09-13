@@ -1,0 +1,16 @@
+html
+  title #{title}
+body
+  if (err)
+    p #{err}
+  - if(url)
+    h2: a(target="_blank" href="http://zhuanlan.zhihu.com#{url}") #{title}
+  - else
+    h2 #{title}
+  p IP: #{ipCount} | Request: #{requestCount} | in 24h
+  - if(docs && docs.length > 0)
+    table(frame='border' rules='all')
+      for doc in docs
+        tr
+          td #{doc.ip}
+          td #{moment(doc.date).fromNow()}

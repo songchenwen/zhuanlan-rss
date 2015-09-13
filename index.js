@@ -121,15 +121,12 @@ app.get('/track/:guid/spacer.gif', function(request, response){
 });
 
 app.get('/stats', function(request, response){
-	var feed = {};
-	var urls;
-	var zhuanlans;
 	async.parallel([
 		function(cb){
-			statsStore.ipCount({type:'request'}, cb);
+			statsStore.ipCount({type:'url'}, cb);
 		}, 
 		function(cb){
-			statsStore.requestCount({type:'request'}, cb);
+			statsStore.requestCount({type:'url'}, cb);
 		},
 		function(cb){
 			statsStore.ipCount({type:'item'}, cb);
@@ -165,6 +162,27 @@ app.get('/stats', function(request, response){
 			items: results[6],
 			moment: moment
 		});
+	});
+});
+
+app.get('/stats/:type/:id', function(request, response){
+	var type = request.params.type;
+	var id = request.params.id;
+	if(!type || !id){
+		response.status(404).end();
+		return;
+	}
+	statsStore.detail({type: type, id: id}, function(err, r){
+		if(err){
+			response.status(500).send(err).end();
+			return;
+		}
+		if(!r){
+			response.status(404).end();
+			return;
+		}
+		r.moment = moment;
+		response.render('detail', r);
 	});
 });
 
