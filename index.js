@@ -4,19 +4,23 @@ var compression = require('compression');
 var bodyParser = require('body-parser');
 var forceDomain = require('forcedomain');
 var moment = require('moment');
-var cache = require('memory-cache');
+var memCache = require('memory-cache');
 var bunyan = require('bunyan');
 var bunyanFormat = require('bunyan-format')({ outputMode: 'short' });
 var rssOptions = require('./lib/rssOptions');
-var Storage = require('./lib/storage');
 var Rss = require('./lib/rss');
+var ItemStore = require('./lib/itemStore');
+var ZhuanlanStore = require('./lib/zhuanlanStore');
 
-var log = bunyan.createLogger({name: 'zrss', stream: bunyanFormat});
-var cacheTime = rssOptions.ttl * 60 * 1000;
+var log = bunyan.createLogger({name: 'zr', stream: bunyanFormat});
+
+var dbDir = (process.env.OPENSHIFT_DATA_DIR || (__dirname + '/data'));
+var itemStore = new ItemStore(dbDir + '/item', log.child({store:'item'}));
+var zhuanlanStore = new ZhuanlanStore(dbDir + '/zhuanlan', log.child({store:'zhuanlan'}));
+
+var memCacheTime = rssOptions.ttl * 60 * 1000;
+
 var startTime = new Date().getTime();
-
-var redisUrl = process.env.REDIS_URL ? process.env.REDIS_URL : 'redis://localhost:6379';
-var storage = new Storage(redisUrl, log.child({ storage: 'redis' }));
 
 var app = express();
 
@@ -65,14 +69,14 @@ app.get('/rss/:ids', function(request, response) {
 		response.redirect('/');
 		return;
 	}
-	var cached = cache.get(ids.join(','));
+	var cached = memCache.get(ids.join(','));
 	if(cached){
 		log.info('found mem cache for ' + ids.join(','));
 		response.set('Content-Type', 'text/xml');
 		response.send(cached).end();
 		return;
 	}
-	var rss = new Rss(ids, storage, log.child({ rss: 'rss' }));
+	var rss = new Rss(ids, itemStore, zhuanlanStore, log.child({ rss: 'rss' }));
 	log.info('request ids ' + ids.join(','));
 
 	var headerSent = false;
@@ -94,7 +98,7 @@ app.get('/rss/:ids', function(request, response) {
 		if(err){
 			response.write(err);
 		}else{
-			cache.put(ids.join(','), xml, cacheTime);
+			memCache.put(ids.join(','), xml, memCacheTime);
 			if(headerSent){
 				xml = xml.replace(xmlHeader, '');
 			}
@@ -102,22 +106,21 @@ app.get('/rss/:ids', function(request, response) {
 		}
 		response.end();
 		log.info('response time ' + ((new Date().getTime() - beginTime) / 1000) + 's');
-		storage.trim();
 	});
 });
 
-app.get('/stats', function(request, response){
-	storage.stats(function(err, result){
-		response.render('stats', {
-			startTime: startTime,
-			host: process.env.OPENSHIFT_NODEJS_PORT ? 'OpenShift' : (process.env.PORT ? 'Heroku' : 'Local'),
-			memCacheKeys: cache.keys(),
-			access: result,
-			err: err,
-			moment: moment
-		});
-	});
-});
+// app.get('/stats', function(request, response){
+// 	storage.stats(function(err, result){
+// 		response.render('stats', {
+// 			startTime: startTime,
+// 			host: process.env.OPENSHIFT_NODEJS_PORT ? 'OpenShift' : (process.env.PORT ? 'Heroku' : 'Local'),
+// 			memCacheKeys: cache.keys(),
+// 			access: result,
+// 			err: err,
+// 			moment: moment
+// 		});
+// 	});
+// });
 
 app.listen(app.get('port'), app.get('ip'), function() {
   log.info('Node app is running on port', app.get('port'));
