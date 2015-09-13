@@ -37,6 +37,7 @@ if(process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT){
 }
 app.use(compression());
 app.use(express.static('public', { maxAge: '1d' }));
+app.set('trust proxy', 'loopback, linklocal, uniquelocal');
 
 var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
 
