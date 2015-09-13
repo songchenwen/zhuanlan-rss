@@ -15,7 +15,11 @@ body
           tr
             td: a(href='/stats/url/#{url.url}') #{url.count}
             td #{moment(url.date).fromNow()}
-            td #{url.url}
+            - if (url.url.length > 100)
+              td #{url.url.substring(0, 100)}...
+                img(src="/img/info.png" title="#{url.url}")
+            - else
+              td #{url.url}
       hr
 
   - if(zhuanlans && zhuanlans.length > 0)
