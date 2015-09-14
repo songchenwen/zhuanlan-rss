@@ -83,7 +83,6 @@ app.get('/rss/:ids', function(request, response) {
 		return;
 	}
 	var rss = new Rss(ids, itemStore, zhuanlanStore, log.child({ rss: 'rss' }));
-	log.info('request ids ' + ids.join(','));
 
 	var headerSent = false;
 

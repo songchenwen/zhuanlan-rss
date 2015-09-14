@@ -7,6 +7,17 @@ body
   p Feed IP: #{feed.ipCount} | Request: #{feed.requestCount} | in 24h
   p Item View IP: #{item.ipCount} | Request: #{item.requestCount} | in 24h
 
+  - if(items && items.length > 0)
+    div
+      p Popular Items
+      table(frame='border' rules='all')
+        for i in items
+          tr
+            td: a(href='/stats/item/#{i.guid}') #{i.count}
+            td #{moment(i.date).fromNow()}
+            td: a(target='_blank' href='http://zhuanlan.zhihu.com/#{i.url}') #{i.title}
+      hr
+
   - if(urls && urls.length > 0)
     div
       p Popular Feeds
@@ -31,17 +42,6 @@ body
             td: a(href='/stats/zhuanlan/#{z.zhuanlan}') #{z.count}
             td #{moment(z.date).fromNow()}
             td: a(target='_blank' href='http://zhuanlan.zhihu.com/#{z.zhuanlan}') #{z.zhuanlan}
-      hr
-
-  - if(items && items.length > 0)
-    div
-      p Popular Items
-      table(frame='border' rules='all')
-        for i in items
-          tr
-            td: a(href='/stats/item/#{i.guid}') #{i.count}
-            td #{moment(i.date).fromNow()}
-            td: a(target='_blank' href='http://zhuanlan.zhihu.com/#{i.url}') #{i.title}
       hr
 
   p:small Memcached #{memCacheKeys.length} requests
