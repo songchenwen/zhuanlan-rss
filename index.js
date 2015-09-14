@@ -73,6 +73,7 @@ app.get('/rss/:ids', function(request, response) {
 		response.redirect('/');
 		return;
 	}
+	log.info({headers: request.headers}, 'headers');
 	statsStore.addRequest(request, ids);
 	var cached = memCache.get(ids.join(','));
 	if(cached){
