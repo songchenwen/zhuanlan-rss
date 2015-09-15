@@ -15,7 +15,7 @@ body
           tr
             td: a(href='/stats/item/#{i.guid}') #{i.count}
             td #{moment(i.date).fromNow()}
-            td: a(target='_blank' href='http://zhuanlan.zhihu.com/#{i.url}') #{i.title}
+            td: a(target='_blank' href='http://zhuanlan.zhihu.com#{i.url}') #{i.title}
       hr
 
   - if(urls && urls.length > 0)
