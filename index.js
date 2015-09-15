@@ -73,7 +73,7 @@ app.get('/rss/:ids', function(request, response) {
 		response.redirect('/');
 		return;
 	}
-	log.info({headers: request.headers}, 'headers');
+	
 	statsStore.addRequest(request, ids);
 	var cached = memCache.get(ids.join(','));
 	if(cached){
@@ -83,7 +83,7 @@ app.get('/rss/:ids', function(request, response) {
 		return;
 	}
 	var rss = new Rss(ids, itemStore, zhuanlanStore, log.child({ rss: 'rss' }));
-
+	log.info('request ids ' + ids.join(','));
 	var headerSent = false;
 
 	var keepAliveTimer = setInterval(function(){
