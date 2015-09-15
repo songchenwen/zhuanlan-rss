@@ -3,7 +3,7 @@ html
 body
   if (err)
     p #{err}
-  p Running for #{moment(startTime).fromNow(true)} on #{host}
+  p Running for #{moment(startTime).fromNow(true)} on #{host}. Memcached #{memCacheKeys.length} requests
   p Feed IP: #{feed.ipCount} | Request: #{feed.requestCount} | in 24h
   p Item View IP: #{item.ipCount} | Request: #{item.requestCount} | in 24h
 
@@ -25,6 +25,7 @@ body
       table(frame='border' rules='all')
         for z in zhuanlans
           tr
+            td: a(href='/stats/zhuanlan/#{z.zhuanlan}') Item IP: #{z.itemIpCount}
             td: a(href='/stats/zhuanlan/#{z.zhuanlan}') IP: #{z.ips.length}
             td: a(href='/stats/zhuanlan/#{z.zhuanlan}') Visit: #{z.count}
             td #{moment(z.date).fromNow()}
@@ -46,5 +47,3 @@ body
             - else
               td #{url.url}
       hr
-
-  p:small Memcached #{memCacheKeys.length} requests
