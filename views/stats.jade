@@ -13,24 +13,10 @@ body
       table(frame='border' rules='all')
         for i in items
           tr
-            td: a(href='/stats/item/#{i.guid}') #{i.count}
+            td: a(href='/stats/item/#{i.guid}') IP: #{i.ips.length}
+            td: a(href='/stats/item/#{i.guid}') Visit: #{i.count}
             td #{moment(i.date).fromNow()}
             td: a(target='_blank' href='http://zhuanlan.zhihu.com#{i.url}') #{i.title}
-      hr
-
-  - if(urls && urls.length > 0)
-    div
-      p Popular Feeds
-      table(frame='border' rules='all')
-        for url in urls
-          tr
-            td: a(href='/stats/url/#{url.url}') #{url.count}
-            td #{moment(url.date).fromNow()}
-            - if (url.url.length > 100)
-              td #{url.url.substring(0, 100)}...
-                img(src="/img/info.png" title="#{url.url}")
-            - else
-              td #{url.url}
       hr
 
   - if(zhuanlans && zhuanlans.length > 0)
@@ -39,9 +25,26 @@ body
       table(frame='border' rules='all')
         for z in zhuanlans
           tr
-            td: a(href='/stats/zhuanlan/#{z.zhuanlan}') #{z.count}
+            td: a(href='/stats/zhuanlan/#{z.zhuanlan}') IP: #{z.ips.length}
+            td: a(href='/stats/zhuanlan/#{z.zhuanlan}') Visit: #{z.count}
             td #{moment(z.date).fromNow()}
             td: a(target='_blank' href='http://zhuanlan.zhihu.com/#{z.zhuanlan}') #{z.zhuanlan}
+      hr
+      
+  - if(urls && urls.length > 0)
+    div
+      p Popular Feeds
+      table(frame='border' rules='all')
+        for url in urls
+          tr
+            td: a(href='/stats/url/#{url.url}') IP: #{url.ips.length}
+            td: a(href='/stats/url/#{url.url}') Visit: #{url.count}
+            td #{moment(url.date).fromNow()}
+            - if (url.url.length > 100)
+              td #{url.url.substring(0, 100)}...
+                img(src="/img/info.png" title="#{url.url}")
+            - else
+              td #{url.url}
       hr
 
   p:small Memcached #{memCacheKeys.length} requests
