@@ -10,6 +10,7 @@ var bunyan = require('bunyan');
 var bunyanFormat = require('bunyan-format')({ outputMode: 'short' });
 var rssOptions = require('./lib/rssOptions');
 var Rss = require('./lib/rss');
+var RssBuilder = require('rss');
 var ItemStore = require('./lib/itemStore');
 var ZhuanlanStore = require('./lib/zhuanlanStore');
 var RecommendItems = require('./lib/recommendItems');
@@ -56,6 +57,55 @@ app.post('/', function(request, response){
 		response.redirect('/rss/' + query);
 	}
 	response.status(404).end();
+});
+
+app.get('/rss/recommends.xml', function(request, response){
+	var headerSent = false;
+	log.info('request for recommends');
+
+	var keepAliveTimer = setInterval(function(){
+		if(!headerSent){
+			log.info('send header first');
+			response.set('Content-Type', 'text/xml');
+			response.status('200').write(xmlHeader + '\n');
+			headerSent = true;
+			return;
+		}
+		log.info('keep alive heart beat');
+		response.write(' ');
+	}, 10000);
+
+	recommend.get(function(err, items){
+		clearInterval(keepAliveTimer);
+		if(err){
+			response.write(err);
+			response.end();
+			return;
+		}
+		var rssOptions = require('./lib/rssOptions');
+		rssOptions.pubDate = new Date();
+		rssOptions.feed_url = rssOptions.feed_url + 'recommends.xml';
+		var feed = new RssBuilder(rssOptions);
+		var trackImage = function(guid){
+			var domain = 'localhost:5000';
+			if(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT){
+				domain = rssOptions.domain;
+			}
+			return '<p><img src="http://' + domain + '/track/' + guid + '/spacer.gif" ></p>';
+		}
+		for(var i = 0; i < items.length; i++){
+			var item = items[i];
+			item.url = 'http://zhuanlan.zhihu.com' + item.url;
+			item.description = item.description + trackImage(item.guid);
+			feed.item(item);
+		}
+		var xml = feed.xml();
+		if(headerSent){
+			xml = xml.replace(xmlHeader, '');
+		}
+		response.write(xml);
+		response.end();
+	});
 });
 
 app.get('/rss/:ids', function(request, response) {
