@@ -12,6 +12,7 @@ var rssOptions = require('./lib/rssOptions');
 var Rss = require('./lib/rss');
 var ItemStore = require('./lib/itemStore');
 var ZhuanlanStore = require('./lib/zhuanlanStore');
+var RecommendItems = require('./lib/recommendItems');
 var StatsStore = require('./lib/statsStore');
 
 var log = bunyan.createLogger({name: 'zr', stream: bunyanFormat});
@@ -20,6 +21,7 @@ var dbDir = (process.env.OPENSHIFT_DATA_DIR || (__dirname + '/data'));
 var itemStore = new ItemStore(dbDir + '/item', log.child({store:'item'}));
 var zhuanlanStore = new ZhuanlanStore(dbDir + '/zhuanlan', log.child({store:'zhuanlan'}));
 var statsStore = new StatsStore(dbDir + '/stats', itemStore, log.child({store:'stats'}));
+var recommend = new RecommendItems(statsStore, itemStore, log.child({store:'recommend'}));
 
 var memCacheTime = rssOptions.ttl * 60 * 1000;
 
@@ -142,7 +144,7 @@ app.get('/stats', function(request, response){
 			statsStore.popularZhuanlan({}, cb);
 		},
 		function(cb){
-			statsStore.popularItem({}, cb);
+			recommend.get(cb);
 		}
 	], function(err, results){
 		response.render('stats', {

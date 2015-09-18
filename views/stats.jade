@@ -13,6 +13,7 @@ body
       table(frame='border' rules='all')
         for i in items
           tr
+            td: a(href='/stats/item/#{i.guid}') Rate: #{i.rate}
             td: a(href='/stats/item/#{i.guid}') IP: #{i.ips.length}
             td: a(href='/stats/item/#{i.guid}') Visit: #{i.count}
             td #{moment(i.date).fromNow()}
