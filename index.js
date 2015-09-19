@@ -75,7 +75,8 @@ app.get('/rss/recommends.xml', function(request, response){
 		response.write(' ');
 	}, 10000);
 
-	recommend.get(function(err, items){
+	recommend.get(function(err, is){
+		var items = JSON.parse(JSON.stringify(is));
 		clearInterval(keepAliveTimer);
 		if(err){
 			response.write(err);
