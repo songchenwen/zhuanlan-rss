@@ -202,7 +202,7 @@ app.get('/stats', function(request, response){
 		response.render('stats', {
 			err: err,
 			startTime: startTime,
-			host: process.env.OPENSHIFT_NODEJS_PORT ? 'OpenShift' : (process.env.PORT ? 'Heroku' : 'Local'),
+			host: process.env.OPENSHIFT_NODEJS_PORT ? 'OpenShift' : (process.env.VCAP_APP_PORT ? 'Coding' : (process.env.PORT ? 'Heroku' : 'Local')),
 			memCacheKeys: memCache.keys(),
 			feed: {
 				ipCount: results[0],
