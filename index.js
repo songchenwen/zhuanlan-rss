@@ -8,6 +8,7 @@ var async = require('async');
 var memCache = require('memory-cache');
 var bunyan = require('bunyan');
 var bunyanFormat = require('bunyan-format')({ outputMode: 'short' });
+var coding = require('./lib/codingFileSystem');
 var rssOptions = require('./lib/rssOptions');
 var Rss = require('./lib/rss');
 var RssBuilder = require('rss');
@@ -18,7 +19,7 @@ var StatsStore = require('./lib/statsStore');
 
 var log = bunyan.createLogger({name: 'zr', stream: bunyanFormat});
 
-var dbDir = (process.env.OPENSHIFT_DATA_DIR || (__dirname + '/data'));
+var dbDir = (process.env.OPENSHIFT_DATA_DIR || coding() || (__dirname + '/data'));
 var itemStore = new ItemStore(dbDir + '/item', log.child({store:'item'}));
 var zhuanlanStore = new ZhuanlanStore(dbDir + '/zhuanlan', log.child({store:'zhuanlan'}));
 var statsStore = new StatsStore(dbDir + '/stats', itemStore, log.child({store:'stats'}));
