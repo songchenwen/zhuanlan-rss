@@ -9,7 +9,7 @@ var memCache = require('memory-cache');
 var bunyan = require('bunyan');
 var bunyanFormat = require('bunyan-format')({ outputMode: 'simple', color: false });
 var coding = require('./lib/codingFileSystem');
-var rssOptions = require('./lib/rssOptions');
+var rssOptionsMain = require('./lib/rssOptions');
 var Rss = require('./lib/rss');
 var RssBuilder = require('rss');
 var ItemStore = require('./lib/itemStore');
@@ -25,7 +25,7 @@ var zhuanlanStore = new ZhuanlanStore(dbDir + '/zhuanlan', log.child({store:'zhu
 var statsStore = new StatsStore(dbDir + '/stats', itemStore, log.child({store:'stats'}));
 var recommend = new RecommendItems(statsStore, itemStore, log.child({store:'recommend'}));
 
-var memCacheTime = rssOptions.ttl * 60 * 1000;
+var memCacheTime = rssOptionsMain.ttl * 60 * 1000;
 
 var startTime = new Date().getTime();
 
@@ -37,7 +37,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 app.set('view engine', 'jade');
 if(process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT){
-	app.use(forceDomain({ hostname: rssOptions.domain }));	
+	app.use(forceDomain({ hostname: rssOptionsMain.domain }));	
 }
 app.use(compression());
 app.use(express.static('public', { maxAge: '1d' }));
